@@ -1,1 +1,34 @@
-/* You can add global styles to this file, and also import other style files */
+body.light-theme .content,
+body.light-theme .main-view {
+  background-color: #f5f5f5;
+  color: #12121c;
+}
+
+body.light-theme .mq-dashboard,
+body.light-theme .endevor-dashboard,
+body.light-theme .zmail-dashboard {
+  background-color: #f5f5f5;
+  color: #12121c;
+}
+
+body.light-theme .card {
+  background-color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .top-header {
+  background-color: #e0f7f1; /* plus doux que le vert fluo */
+  color: #12121c;
+}
+
+body.light-theme .section-title {
+  color: #12121c;
+}
+
+body.light-theme table,
+body.light-theme th,
+body.light-theme td {
+  background-color: #fff;
+  color: #12121c;
+  border: 1px solid #ddd;
+}
