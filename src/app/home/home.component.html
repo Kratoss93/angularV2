@@ -15,9 +15,9 @@
   <aside class="sidebar">
     <div class="logo">📊 Monitoring</div>
     <nav class="nav">
-      <a (click)="showSection('mq')"      [class.active]="selectedSection === 'mq'"><span>🧪</span> MQ</a>
-      <a (click)="showSection('endevor')" [class.active]="selectedSection === 'endevor'"><span>📁</span> ENDEVOR</a>
-      <a (click)="showSection('zmail')"   [class.active]="selectedSection === 'zmail'"><span>📬</span> ZMAIL</a>
+      <a (click)="showSection('mq')"      [class.active]="selectedSection==='mq'">🧪 MQ</a>
+      <a (click)="showSection('endevor')" [class.active]="selectedSection==='endevor'">📁 ENDEVOR</a>
+      <a (click)="showSection('zmail')"   [class.active]="selectedSection==='zmail'">📬 ZMAIL</a>
     </nav>
   </aside>
 
@@ -27,17 +27,14 @@
     </header>
 
     <section class="main-view">
-      <!-- ======================== MQ ======================== -->
-      <div *ngIf="selectedSection === 'mq'" class="mq-dashboard">
-        <h2><i class="fa-solid fa-flask"></i> Monitoring MQSeries</h2>
+
+      <!-- ========== MQ ========== -->
+      <div *ngIf="selectedSection==='mq'" class="mq-dashboard">
+        <h2>Monitoring MQSeries</h2>
         <p>Dernière mise à jour : {{ lastUpdate | date:'shortTime' }}</p>
 
         <div class="toolbar">
-          <input
-            type="text"
-            [(ngModel)]="searchTerm"
-            placeholder="🔍 Filtrer les queues..."
-          />
+          <input [(ngModel)]="searchTerm" placeholder="🔍 Filtrer les queues…" />
           <button (click)="refreshData()">🔁 Rafraîchir</button>
         </div>
 
@@ -54,114 +51,88 @@
 
         <table>
           <thead>
-            <tr>
-              <th>Queue</th>
-              <th>Messages</th>
-              <th>Status</th>
-            </tr>
+            <tr><th>Queue</th><th>Messages</th><th>Status</th></tr>
           </thead>
           <tbody>
-            <tr *ngFor="let queue of filteredQueues">
-              <td>{{ queue.name }}</td>
-              <td>{{ queue.messages }}</td>
-              <td>
-                <span class="badge" [ngClass]="getBadgeClass(queue.status)">
-                  {{ queue.status }}
-                </span>
-              </td>
+            <tr *ngFor="let q of filteredQueues">
+              <td>{{ q.name }}</td>
+              <td>{{ q.messages }}</td>
+              <td><span class="badge" [ngClass]="getBadgeClass(q.status)">{{ q.status }}</span></td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- ======================= ENDEVOR ======================= -->
-      <div *ngIf="selectedSection === 'endevor'" class="endevor-dashboard">
-        <h2><i class="fa-solid fa-folder"></i> ENDEVOR - Fichiers</h2>
-        <p>Dernière mise à jour : {{ lastUpdate | date:'shortTime' }}</p>
+      <!-- ======== ENDEVOR ======== -->
+      <div *ngIf="selectedSection==='endevor'" class="endevor-dashboard">
+  <h2>ENDEVOR : Fichiers</h2>
 
-        <div class="toolbar">
-          <input
-            type="text"
-            [(ngModel)]="endevorSearchTerm"
-            placeholder="🔍 Filtrer les fichiers..."
-          />
-          <button (click)="refreshData()">🔁 Rafraîchir</button>
-        </div>
+  <!-- sous‐onglets -->
+  <div class="tabs">
+    <button (click)="endevorTab='occupation'"   [class.active]="endevorTab==='occupation'">Occupation</button>
+    <button (click)="endevorTab='reclassement'" [class.active]="endevorTab==='reclassement'">Reclassement</button>
+    <button (click)="endevorTab='gestion'"      [class.active]="endevorTab==='gestion'">Logs</button>
+  </div>
 
-        <div class="dashboard-cards">
-          <div class="card" *ngFor="let file of filteredEndevorFiles">
-            <h4>{{ file.file_name }}</h4>
-            <p><strong>Env :</strong> {{ file.environment }}</p>
-            <p><strong>Machine :</strong> {{ file.machine }}</p>
-            <p>
-              <strong>Status :</strong>
-              <span class="badge" [ngClass]="getBadgeClass(file.status)">
-                {{ file.status }}
-              </span>
-            </p>
-            <p>
-              <strong>Modifié :</strong>
-              {{ file.last_modified | date:'short' }}
-            </p>
-            <button (click)="deleteFile(file.id!)">🗑️</button>
-          </div>
-        </div>
+  <!-- filtre commun -->
+  <div class="toolbar">
+    <input [(ngModel)]="endevorSearchTerm" placeholder="🔍 Filtrer fichiers…" />
+    <button (click)="refreshData()">🔁</button>
+  </div>
 
-        <table class="file-status">
-          <thead>
-            <tr>
-              <th>Nom du fichier</th>
-              <th>Environnement</th>
-              <th>Machine</th>
-              <th>Statut</th>
-              <th>Modifié</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let file of filteredEndevorFiles">
-              <td>{{ file.file_name }}</td>
-              <td>{{ file.environment }}</td>
-              <td>{{ file.machine }}</td>
-              <td>
-                <span class="badge" [ngClass]="getBadgeClass(file.status)">
-                  {{ file.status }}
-                </span>
-              </td>
-              <td>{{ file.last_modified | date:'short' }}</td>
-              <td>
-                <button (click)="deleteFile(file.id!)">🗑️</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+  <!-- Occupation -->
+<div *ngIf="endevorTab==='occupation'" class="tab-content">
+  <h3>📊 Stats d’occupation</h3>
+  <div class="grid-occupation">
+    <div *ngFor="let s of endevorOccupancyStats" class="occupation-row">
+      <div class="filename">{{ s.environment }}</div>
+      <div class="usage">{{ s.count }}%</div>
+    </div>
+  </div>
+</div>
+  <!-- Reclassement -->
+  <div *ngIf="endevorTab==='reclassement'" class="tab-content">
+    <h3>Fichiers à reclassement</h3>
+    <ul>
+      <li *ngFor="let f of reclassementList">
+        {{ f.file_name }} ({{ f.environment }})
+      </li>
+    </ul>
+  </div>
 
-      <!-- ======================= ZMAIL ======================= -->
-      <div *ngIf="selectedSection === 'zmail'" class="zmail-dashboard">
-        <h2><i class="fa-solid fa-envelope-circle-check"></i> ZMAIL - Services de messagerie</h2>
+  <!-- Logs de gestion -->
+  <div *ngIf="endevorTab==='gestion'" class="tab-content">
+    <h3>Logs de gestion</h3>
+    <table>
+      <thead><tr><th>Date</th><th>Action</th><th>Fichier</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let lg of gestionLogs">
+          <td>{{ lg.timestamp | date:'short' }}</td>
+          <td>{{ lg.action }}</td>
+          <td>{{ lg.file }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+      <!-- ========= ZMAIL ========= -->
+      <div *ngIf="selectedSection==='zmail'" class="zmail-dashboard">
+        <h2>ZMAIL – Services</h2>
         <p>Dernière mise à jour : {{ lastUpdate | date:'shortTime' }}</p>
         <table>
-          <thead>
-            <tr>
-              <th>Service</th>
-              <th>Statut</th>
-              <th>Dernier Check</th>
-            </tr>
-          </thead>
+          <thead><tr><th>Service</th><th>Statut</th><th>Dernier Check</th></tr></thead>
           <tbody>
-            <tr *ngFor="let svc of zmailServices">
-              <td>{{ svc.name }}</td>
-              <td>
-                <span class="badge" [ngClass]="getBadgeClass(svc.status)">
-                  {{ svc.status }}
-                </span>
-              </td>
-              <td>{{ svc.lastCheck }}</td>
+            <tr *ngFor="let s of zmailServices">
+              <td>{{ s.name }}</td>
+              <td><span class="badge" [ngClass]="getBadgeClass(s.status)">{{ s.status }}</span></td>
+              <td>{{ s.lastCheck }}</td>
             </tr>
           </tbody>
         </table>
       </div>
+
     </section>
   </main>
 </div>
